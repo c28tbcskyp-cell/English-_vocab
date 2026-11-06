@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#172554">
+<title>English Vocab | 英検準2級</title>
+<style>
+:root{--navy:#172554;--blue:#2563eb;--green:#15803d;--amber:#b45309;--ink:#172033;--muted:#64748b;--line:#e2e8f0;--bg:#f4f7fb;--card:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:var(--navy);color:white;padding:24px 18px 28px}header .wrap,main{max-width:760px;margin:auto}
+.brand{font-size:12px;letter-spacing:.14em;color:#bfdbfe;font-weight:700}.hero{font-size:26px;font-weight:800;margin:9px 0 4px}.sub{color:#cbd5e1;font-size:13px}
+main{padding:18px 14px 50px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin:0 0 14px;box-shadow:0 4px 18px #0f172a08}
+h2{font-size:18px;margin:0 0 14px}.muted{color:var(--muted);font-size:13px}.row{display:flex;gap:9px;flex-wrap:wrap}.row>*{flex:1}
+button,select,input{font:inherit}button{border:0;border-radius:12px;padding:13px 15px;font-weight:700;cursor:pointer;background:#e8eefc;color:#1e3a8a}
+button.primary{background:var(--blue);color:white}button.good{background:#dcfce7;color:#166534}button.warn{background:#fef3c7;color:#92400e}button.ghost{background:#f1f5f9;color:#334155}button:disabled{opacity:.45;cursor:not-allowed}
+select,input{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:white;color:var(--ink)}
+label{font-size:13px;font-weight:700;display:block;margin:0 0 7px}.field{margin:12px 0}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#f8fafc;border-radius:12px;padding:12px}.stat b{font-size:22px;display:block}.stat span{font-size:11px;color:var(--muted)}
+.progress{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:12px 0}.progress div{height:100%;background:#16a34a;width:0}
+.question{font-size:30px;font-weight:800;text-align:center;padding:28px 8px;overflow-wrap:anywhere}.answer{background:#eff6ff;border-radius:13px;padding:16px;text-align:center;font-size:20px;font-weight:750;margin:12px 0}.hidden{display:none!important}
+.pill{display:inline-block;background:#eff6ff;color:#1d4ed8;border-radius:99px;padding:5px 10px;font-size:12px;font-weight:700}
+.wordrow{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px}.wordrow:last-child{border:0}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:12px}
+@media(max-width:480px){.hero{font-size:23px}.card{padding:16px}.question{font-size:27px}.row button{min-width:42%}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="brand">ENGLISH VOCABULARY TRAINER</div><div class="hero">英検準2級 単語トレーニング</div><div class="sub">30問ずつ、覚えた単語を着実に増やそう。</div></div></header>
+<main>
+<section id="home">
+ <div class="card">
+  <h2>学習を始める</h2>
+  <div class="field"><label for="mode">出題モード</label><select id="mode"><option value="en">英→和（英語を見て意味を答える）</option><option value="ja">和→英（意味を見て英語を答える）</option><option value="spell">スペル（英語を書いて答える）</option></select></div>
+  <button class="primary" style="width:100%" onclick="start(false)">30問スタート</button>
+  <p class="muted">答えを見るまでは「スキップ」できます。答えを見た後に「覚えた」か「要注意」を選びます。</p>
+ </div>
+ <div class="card">
+  <h2>学習状況</h2><div class="statgrid">
+   <div class="stat"><b id="learnedCount">0</b><span>覚えた単語</span></div>
+   <div class="stat"><b id="reviewCount">0</b><span>要注意</span></div>
+   <div class="stat"><b id="skipCount">0</b><span>スキップ</span></div>
+  </div>
+  <div class="row" style="margin-top:14px"><button class="warn" onclick="start(true)">要注意・スキップを復習</button><button class="ghost" onclick="showHistory()">学習記録を見る</button></div>
+  <p class="muted" id="reviewHint"></p>
+ </div>
+</section>
+<section id="quiz" class="hidden">
+ <div class="card">
+  <div class="row" style="align-items:center"><span class="pill" id="modeLabel">英→和</span><span class="muted" id="counter" style="text-align:right">1 / 30</span></div>
+  <div class="progress"><div id="bar"></div></div>
+  <div class="question" id="prompt"></div>
+  <div id="spellArea" class="field hidden"><label for="typed">スペルを入力</label><input id="typed" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="英単語を入力"></div>
+  <div id="answer" class="answer hidden"></div>
+  <div class="row" id="preReveal"><button class="ghost" onclick="skip()">スキップ</button><button class="primary" onclick="reveal()">答えを見る</button></div>
+  <div class="row hidden" id="postReveal"><button class="good" onclick="mark('learned')">覚えた</button><button class="warn" onclick="mark('review')">要注意</button></div>
+  <p class="muted" id="example" style="text-align:center;margin-top:12px"></p>
+ </div>
+ <button class="ghost" style="width:100%" onclick="goHome()">学習を中断してトップへ</button>
+</section>
+<section id="result" class="hidden">
+ <div class="card"><h2>今回のリザルト</h2><p class="muted" id="resultTitle"></p><div class="statgrid">
+  <div class="stat"><b id="rLearned">0</b><span>覚えた</span></div><div class="stat"><b id="rReview">0</b><span>要注意</span></div><div class="stat"><b id="rSkip">0</b><span>スキップ</span></div>
+ </div></div>
+ <div class="card"><h2>問題ごとの結果</h2><div id="resultList"></div></div>
+ <div class="row"><button class="primary" onclick="goHome()">トップに戻る</button><button class="warn" onclick="start(true)">要注意・スキップを復習</button></div>
+</section>
+<section id="history" class="hidden"><div class="card"><h2>学習記録</h2><div id="historyList"></div><button class="ghost" style="width:100%;margin-top:14px" onclick="goHome()">戻る</button></div></section>
+<footer>学習状況はこのブラウザ内に保存されます。</footer>
+</main>
+<script>
+const words=[
+["achieve","達成する","She achieved her goal.",""],
+["afford","〜する余裕がある","I can't afford a new car.",""],
+["allow","許す、可能にする","The rules allow it.",""],
+["appear","現れる、〜のように見える","A rainbow appeared.",""],
+["apply","申し込む；当てはまる","apply for a job","for"],
+["avoid","避ける","Avoid making the same mistake.",""],
+["belong","所属している","This book belongs to me.","to"],
+["borrow","借りる","Can I borrow your pen?",""],
+["cause","原因となる；原因","Smoking can cause illness.",""],
+["compare","比較する","Compare this with that.","with"],
+["consider","よく考える","Consider the question carefully.",""],
+["contain","含む","This box contains books.",""],
+["continue","続ける","Please continue reading.",""],
+["create","創造する、作り出す","They created a new plan.",""],
+["depend","〜次第である","It depends on the weather.","on"],
+["develop","発達する、発展させる","The town developed quickly.",""],
+["discover","発見する","They discovered a new island.",""],
+["encourage","励ます","My teacher encouraged me.",""],
+["environment","環境","We must protect the environment.",""],
+["experience","経験；経験する","It was a great experience.",""],
+["foreign","外国の","She speaks a foreign language.",""],
+["improve","改善する、上達する","I want to improve my English.",""],
+["increase","増える；増やす","Prices increased last year.",""],
+["instead","その代わりに","We stayed home instead.",""],
+["invite","招待する","I invited him to dinner.","to"],
+["likely","ありそうな","It is likely to rain.",""],
+["manage","なんとか〜する、管理する","I managed to finish it.","to"],
+["opportunity","機会","This is a good opportunity.",""],
+["provide","提供する","The school provides lunch.",""],
+["suggest","提案する","She suggested a new idea.",""]
+];
+let queue=[],idx=0,mode="en",session=[],revealed=false,isReview=false;
+const $=id=>document.getElementById(id);
+const load=()=>{try{return JSON.parse(localStorage.getItem("vocabProgress")||'{"learned":[],"review":[],"skipped":[],"history":[]}')}catch(e){return {learned:[],review:[],skipped:[],history:[]}}};
+let data=load();
+function save(){localStorage.setItem("vocabProgress",JSON.stringify(data));updateHome()}
+function updateHome(){
+ $("learnedCount").textContent=data.learned.length;$("reviewCount").textContent=data.review.length;$("skipCount").textContent=data.skipped.length;
+ $("reviewHint").textContent=`復習対象：${data.review.length+data.skipped.length}語`;
+}
+function section(id){["home","quiz","result","history"].forEach(x=>$(x).classList.toggle("hidden",x!==id))}
+function goHome(){section("home");updateHome()}
+function start(review){
+ isReview=review;mode=$("mode").value;idx=0;session=[];
+ let candidates=review?[...new Set([...data.review,...data.skipped])].map(w=>words.find(x=>x[0]===w)).filter(Boolean):words.slice();
+ if(!candidates.length){alert("復習する単語はありません！");return}
+ queue=candidates.slice(0,review?candidates.length:30);section("quiz");render();
+}
+function render(){
+ if(idx>=queue.length){finish();return}
+ let w=queue[idx];revealed=false;$("counter").textContent=`${idx+1} / ${queue.length}`;$("bar").style.width=`${idx/queue.length*100}%`;
+ $("modeLabel").textContent=mode==="en"?"英→和":mode==="ja"?"和→英":"スペル";
+ $("prompt").textContent=mode==="en"?w[0]:w[1];
+ $("spellArea").classList.toggle("hidden",mode!=="spell");$("typed").value="";
+ $("answer").classList.add("hidden");$("preReveal").classList.remove("hidden");$("postReveal").classList.add("hidden");$("example").textContent="";
+}
+function reveal(){
+ if(revealed)return;revealed=true;let w=queue[idx];
+ $("answer").textContent=mode==="en"?w[1]:w[0];$("answer").classList.remove("hidden");
+ $("preReveal").classList.add("hidden");$("postReveal").classList.remove("hidden");
+ $("example").textContent=w[2]+(w[3]?`（重要な前置詞：${w[3]}）`:"");
+ if(mode==="spell"&&$("typed").value.trim())$("example").textContent=`入力：${$("typed").value.trim()} ／ 正解：${w[0]}　`+$("example").textContent;
+}
+function removeAll(word){["learned","review","skipped"].forEach(k=>data[k]=data[k].filter(x=>x!==word))}
+function mark(status){
+ let w=queue[idx];removeAll(w[0]);if(status==="learned")data.learned.push(w[0]);else data.review.push(w[0]);
+ session.push({word:w[0],meaning:w[1],status});save();idx++;render();
+}
+function skip(){
+ let w=queue[idx];removeAll(w[0]);data.skipped.push(w[0]);session.push({word:w[0],meaning:w[1],status:"skipped"});save();idx++;render();
+}
+function finish(){
+ section("result");let a=session.filter(x=>x.status==="learned").length,b=session.filter(x=>x.status==="review").length,c=session.filter(x=>x.status==="skipped").length;
+ $("resultTitle").textContent=`${session.length}問完了${isReview?"（復習）":""}`;
+ $("rLearned").textContent=a;$("rReview").textContent=b;$("rSkip").textContent=c;
+ $("resultList").innerHTML=session.map(x=>`<div class="wordrow"><span><b>${x.word}</b><br><span class="muted">${x.meaning}</span></span><span>${x.status==="learned"?"✅ 覚えた":x.status==="review"?"⚠️ 要注意":"⏭ スキップ"}</span></div>`).join("");
+ data.history.unshift({date:new Date().toLocaleString("ja-JP"),count:session.length,learned:a,review:b,skipped:c});data.history=data.history.slice(0,30);save();
+}
+function showHistory(){section("history");$("historyList").innerHTML=data.history.length?data.history.map(h=>`<div class="wordrow"><span>${h.date}<br><span class="muted">${h.count}問</span></span><span>✅${h.learned}　⚠️${h.review}　⏭${h.skipped}</span></div>`).join(""):"まだ学習記録がありません。"}
+updateHome();
+</script>
+</body></html>
